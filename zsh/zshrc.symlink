@@ -43,7 +43,7 @@ unset config_files
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
-export PATH=$PATH:$HOME/software/android-sdk-linux/tools:$HOME/software/android-sdk-linux/platform-tools:/$HOME/software/genymotion:$HOME/software/racket/bin
+export PATH=$PATH:$HOME/software/racket/bin
 ###-begin-tns-completion-###
 if complete &>/dev/null; then
   _tns_completion () {
