@@ -4,6 +4,12 @@ export ZSH=$HOME/.dotfiles
 # your project folder that we can `c [tab]` to
 export PROJECTS=~/projects
 export GOHOME=/usr/local/go
+export GOROOT=/usr/local/go
+export GOPATH=~/projects/go
+export GO15VENDOREXPERIMENT=1
+
+export ANDROID_HOME=/Users/davidc/Library/Developer/Xamarin/android-sdk-macosx
+export JAVA_HOME=$(/usr/libexec/java_home)
 
 # Stash your environment variables in ~/.localrc. This means they'll stay out
 # of your main dotfiles repository (which may be public, like this one), but
@@ -43,3 +49,6 @@ unset config_files
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+
+export PATH="/usr/local/share/python:$PATH:/Users/davidc/projects/go/bin:/Users/davidc/Library/Developer/Xamarin/android-sdk-macosx/platform-tools:/Users/davidc/Library/Developer/Xamarin/android-sdk-macosx/tools"
+
