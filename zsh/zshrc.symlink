@@ -5,7 +5,7 @@ export ZSH=$HOME/.dotfiles
 export PROJECTS=~/projects
 export GOHOME=/usr/local/go
 export GOROOT=/usr/local/go
-export GOPATH=~/projects/go
+export GOPATH=$HOME/projects/go
 export GO15VENDOREXPERIMENT=1
 
 export ANDROID_HOME=/Users/davidc/Library/Developer/Xamarin/android-sdk-macosx
@@ -46,6 +46,8 @@ do
 done
 
 unset config_files
+
+PATH=$PATH:$HOME/software/android/sdk/tools:$HOME/software/android/sdk/platform-tools::$GOROOT/bin:$GOPATH/bin
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm

@@ -1,6 +1,0 @@
-{
-  "env": {
-    "GOPATH": "$HOME/projects/go",
-    "GOHOME": "/usr/local/go"
-  }
-}
