@@ -8,7 +8,6 @@ export GOROOT=/usr/local/go
 export GOPATH=$HOME/projects/go
 export GO15VENDOREXPERIMENT=1
 
-export ANDROID_HOME=/Users/davidc/Library/Developer/Xamarin/android-sdk-macosx
 export JAVA_HOME=$(/usr/libexec/java_home)
 
 # Stash your environment variables in ~/.localrc. This means they'll stay out
@@ -52,5 +51,13 @@ PATH=$PATH:$HOME/software/android/sdk/tools:$HOME/software/android/sdk/platform-
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
-export PATH="/usr/local/share/python:$PATH:/Users/davidc/projects/go/bin:/Users/davidc/Library/Developer/Xamarin/android-sdk-macosx/platform-tools:/Users/davidc/Library/Developer/Xamarin/android-sdk-macosx/tools"
+export PATH="/usr/local/share/python:$PATH:/Users/davidc/projects/go/bin"
+
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completiona
+
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/tools
+export PATH=$PATH:$ANDROID_HOME/tools/bin
+export PATH=$PATH:$ANDROID_HOME/platform-tools
 
