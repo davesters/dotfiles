@@ -1,0 +1,11 @@
+[tools]
+go = "1.26"
+node = "24"
+python = "3.13"
+uv = "latest"
+"pipx:awscli-local" = "latest"
+"pipx:aws-sam-cli-local" = "latest"
+
+[settings]
+idiomatic_version_file_enable_tools = ["node", "python"]
+go_set_gobin = false

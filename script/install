@@ -1,10 +1,42 @@
 #!/usr/bin/env bash
-#
-# Run all dotfiles installers.
+set -euo pipefail
 
-set -e
+cd "$(dirname "$0")/.."
+DOTFILES=$(pwd)
 
-cd "$(dirname $0)"/..
+link() {
+  local src=$1 dst=$2
+  if [ -L "$dst" ] && [ "$(readlink -f "$dst")" = "$(readlink -f "$src")" ]; then
+    echo "ok      $dst"
+    return
+  fi
+  if [ -e "$dst" ] || [ -L "$dst" ]; then
+    mv "$dst" "$dst.backup"
+    echo "backup  $dst -> $dst.backup"
+  fi
+  mkdir -p "$(dirname "$dst")"
+  ln -s "$src" "$dst"
+  echo "linked  $dst"
+}
 
-# find the installers and run them iteratively
-find . -name install.sh | while read installer ; do sh -c "${installer}" ; done
+if [ ! -f git/gitconfig.symlink ]; then
+  read -rp "Git author name: " name
+  read -rp "Git author email: " email
+  sed -e "s|AUTHORNAME|$name|" -e "s|AUTHOREMAIL|$email|" git/gitconfig.symlink.example > git/gitconfig.symlink
+fi
+
+for src in "$DOTFILES"/*/*.symlink; do
+  link "$src" "$HOME/.$(basename "${src%.symlink}")"
+done
+link "$DOTFILES/mise/config.toml" "$HOME/.config/mise/config.toml"
+link "$DOTFILES/starship/starship.toml" "$HOME/.config/starship.toml"
+
+command -v brew >/dev/null || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Brewfile's go/npm entries need mise's toolchain on PATH.
+brew install mise
+mise install
+# Persisted so tools that don't read the shell env (brew bundle, editors) agree on GOPATH.
+mise exec -- go env -w GOPATH="$HOME/projects/go"
+PATH="$HOME/.local/share/mise/shims:$PATH" brew bundle --no-upgrade --file="$DOTFILES/Brewfile"

@@ -1,8 +1,2 @@
-atom.symlink/.node-gyp
-atom.symlink/.storage
-atom.symlink/compile-cache/
-atom.symlink/packages
-atom.symlink/storage
-atom.symlink/themes
-
+.DS_Store
 git/gitconfig.symlink

@@ -1,88 +1,95 @@
-# holman does dotfiles
+# dotfiles
 
-## dotfiles
+macOS (Apple Silicon) shell and tool setup: zsh, [starship](https://starship.rs) prompt,
+[mise](https://mise.jdx.dev) for Go/Node/Python, and a `Brewfile` for everything else.
 
-Your dotfiles are how you personalize your system. These are mine.
+## New machine setup
 
-I was a little tired of having long alias files and everything strewn about
-(which is extremely common on other dotfiles projects, too). That led to this
-project being much more topic-centric. I realized I could split a lot of things
-up into the main areas I used (Ruby, git, system libraries, and so on), so I
-structured the project accordingly.
+1. **Install the Xcode Command Line Tools** (provides `git` for the clone):
 
-If you're interested in the philosophy behind why projects like these are
-awesome, you might want to [read my post on the
-subject](http://zachholman.com/2010/08/dotfiles-are-meant-to-be-forked/).
+   ```sh
+   xcode-select --install
+   ```
 
-## install
+2. **Clone this repo to `~/.dotfiles`** (HTTPS, since there's no SSH key yet):
 
-Run this:
+   ```sh
+   git clone https://github.com/davesters/dotfiles.git ~/.dotfiles
+   ```
 
-```sh
-git clone https://github.com/holman/dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
-script/bootstrap
-```
+3. **Run the installer:**
 
-This will symlink the appropriate files in `.dotfiles` to your home directory.
-Everything is configured and tweaked within `~/.dotfiles`.
+   ```sh
+   ~/.dotfiles/script/install
+   ```
 
-The main file you'll want to change right off the bat is `zsh/zshrc.symlink`,
-which sets up a few paths that'll be different on your particular machine.
+   It prompts for your git name and email on first run, then:
+   - symlinks every `*.symlink` file into `$HOME` as a dotfile (e.g. `zsh/zshrc.symlink` → `~/.zshrc`),
+     plus `mise/config.toml` → `~/.config/mise/config.toml` and `starship/starship.toml` → `~/.config/starship.toml`.
+     Existing files are moved to `<name>.backup`.
+   - installs Homebrew if missing
+   - installs mise and the Go/Node/Python versions in `mise/config.toml`
+   - sets `GOPATH` to `~/projects/go`
+   - runs `brew bundle` to install everything in `Brewfile`: formulae, apps (VS Code, Android Studio,
+     Rancher Desktop), Go tools, and global npm packages
 
-`dot` is a simple script that installs some dependencies, sets sane OS X
-defaults, and so on. Tweak this script, and occasionally run `dot` from
-time to time to keep your environment fresh and up-to-date. You can find
-this script in `bin/`.
+   It is safe to re-run.
 
-## topical
+4. **Create `~/.localrc`** for machine-specific env and secrets (sourced by `.zshrc`, never committed):
 
-Everything's built around topic areas. If you're adding a new area to your
-forked dotfiles — say, "Java" — you can simply add a `java` directory and put
-files in there. Anything with an extension of `.zsh` will get automatically
-included into your shell. Anything with an extension of `.symlink` will get
-symlinked without extension into `$HOME` when you run `script/bootstrap`.
+   ```sh
+   export GITHUB_TOKEN=...
+   export GOPRIVATE="github.com/floatme-corp/*"
+   ```
 
-## what's inside
+5. **Set up GitHub access:**
 
-A lot of stuff. Seriously, a lot of stuff. Check them out in the file browser
-above and see what components may mesh up with you.
-[Fork it](https://github.com/holman/dotfiles/fork), remove what you don't
-use, and build on what you do use.
+   ```sh
+   ssh-keygen -t ed25519 -C "you@example.com"
+   gh auth login
+   ```
 
-## components
+   For private Go modules over SSH, add to `git/gitconfig.symlink`:
 
-There's a few special files in the hierarchy.
+   ```ini
+   [url "git@github.com:floatme-corp/"]
+       insteadOf = https://github.com/floatme-corp/
+   ```
 
-- **bin/**: Anything in `bin/` will get added to your `$PATH` and be made
-  available everywhere.
-- **topic/\*.zsh**: Any files ending in `.zsh` get loaded into your
-  environment.
-- **topic/path.zsh**: Any file named `path.zsh` is loaded first and is
-  expected to setup `$PATH` or similar.
-- **topic/completion.zsh**: Any file named `completion.zsh` is loaded
-  last and is expected to setup autocomplete.
-- **topic/\*.symlink**: Any files ending in `*.symlink` get symlinked into
-  your `$HOME`. This is so you can keep all of those versioned in your dotfiles
-  but still keep those autoloaded files in your home directory. These get
-  symlinked in when you run `script/bootstrap`.
+6. **Open a new terminal.**
 
-## bugs
+### Manual installs
 
-I want this to work for everyone; that means when you clone it down it should
-work for you even though you may not have `rbenv` installed, for example. That
-said, I do use this as *my* dotfiles, so there's a good chance I may break
-something if I forget to make a check for a dependency.
+Not covered by the installer:
 
-If you're brand-new to the project and run into any blockers, please
-[open an issue](https://github.com/holman/dotfiles/issues) on this repository
-and I'd love to get it fixed for you!
+- Flutter, expected at `~/software/flutter`.
+- Android SDK, installed through Android Studio's SDK Manager to `~/Library/Android/sdk`.
+- For `jdk <version>` to find Homebrew's JDK, symlink it into the system JDK directory:
+  `sudo ln -sfn /opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-17.jdk`
 
-## thanks
+## Layout
 
-I forked [Ryan Bates](http://github.com/ryanb)' excellent
-[dotfiles](http://github.com/ryanb/dotfiles) for a couple years before the
-weight of my changes and tweaks inspired me to finally roll my own. But Ryan's
-dotfiles were an easy way to get into bash customization, and then to jump ship
-to zsh a bit later. A decent amount of the code in these dotfiles stem or are
-inspired from Ryan's original project.
+Each top-level directory is a topic. Within a topic:
+
+- `*.zsh` files are sourced by `.zshrc`, and `completion.zsh` files are sourced after `compinit`.
+- `*.symlink` files are linked into `$HOME` by `script/install`.
+
+| Path | Contents |
+|---|---|
+| `zsh/zshrc.symlink` | Env vars, `PATH`, loader, mise + starship init |
+| `zsh/zprofile.symlink` | Homebrew `shellenv` for login shells |
+| `zsh/config.zsh` | History, shell options, key bindings |
+| `zsh/window.zsh` | Terminal title |
+| `git/` | Git aliases, global gitignore, gitconfig template (`gitconfig.symlink` is generated and gitignored) |
+| `functions/` | Autoloaded functions: `c` (cd into `$PROJECTS`), `gf` (check out a remote branch), `extract`, `jdk <version>` |
+| `system/keys.zsh` | `pubkey`: copy your SSH public key to the clipboard |
+| `mise/config.toml` | Global tool versions (Go, Node, Python, uv, pipx CLIs) |
+| `starship/starship.toml` | Prompt: `user in ~/path on branch [status] >` |
+| `Brewfile` | Homebrew formulae/casks, Go tools, global npm packages |
+
+## Maintenance
+
+- Change a global language version: `mise use -g node@26` (writes to `mise/config.toml` via the symlink).
+- Pin a version per project: add `mise.toml`, `.nvmrc`, or `.python-version` in that project.
+- Capture newly installed Homebrew packages: `brew bundle dump --force --file=~/.dotfiles/Brewfile`, then review the diff.
+- Reload the shell: `reload!`

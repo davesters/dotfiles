@@ -1,63 +1,37 @@
-# shortcut to this dotfiles path is $ZSH
 export ZSH=$HOME/.dotfiles
-
-# your project folder that we can `c [tab]` to
-export PROJECTS=~/projects
-export GOHOME=/usr/local/go
-export GOROOT=/usr/local/go
+export PROJECTS=$HOME/projects
 export GOPATH=$HOME/projects/go
-export GO15VENDOREXPERIMENT=1
-
-export JAVA_HOME=$(/usr/libexec/java_home)
-
-# Stash your environment variables in ~/.localrc. This means they'll stay out
-# of your main dotfiles repository (which may be public, like this one), but
-# you'll have access to them in your scripts.
-if [[ -a ~/.localrc ]]
-then
-  source ~/.localrc
-fi
-
-# all of our zsh files
-typeset -U config_files
-config_files=($ZSH/**/*.zsh)
-
-# load the path files
-for file in ${(M)config_files:#*/path.zsh}
-do
-  source $file
-done
-
-# load everything but the path and completion files
-for file in ${${config_files:#*/path.zsh}:#*/completion.zsh}
-do
-  source $file
-done
-
-# initialize autocomplete here, otherwise functions won't be loaded
-autoload -U compinit
-compinit
-
-# load every completion after autocomplete loads
-for file in ${(M)config_files:#*/completion.zsh}
-do
-  source $file
-done
-
-unset config_files
-
-PATH=$PATH:$HOME/software/android/sdk/tools:$HOME/software/android/sdk/platform-tools::$GOROOT/bin:$GOPATH/bin
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
-
-export PATH="/usr/local/share/python:$PATH:/Users/davidc/projects/go/bin"
-
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completiona
-
 export ANDROID_HOME=$HOME/Library/Android/sdk
-export PATH=$PATH:$ANDROID_HOME/emulator
-export PATH=$PATH:$ANDROID_HOME/tools
-export PATH=$PATH:$ANDROID_HOME/tools/bin
-export PATH=$PATH:$ANDROID_HOME/platform-tools
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+export EDITOR='code --wait'
 
+# Machine-local env and secrets; not tracked.
+[[ -f ~/.localrc ]] && source ~/.localrc
+
+typeset -U path fpath
+path=(
+  $HOME/.local/bin
+  $GOPATH/bin
+  "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  $ANDROID_HOME/cmdline-tools/latest/bin
+  $ANDROID_HOME/platform-tools
+  $ANDROID_HOME/emulator
+  $HOME/software/flutter/bin
+  $path
+)
+fpath=($ZSH/functions ${HOMEBREW_PREFIX:-/opt/homebrew}/share/zsh/site-functions $fpath)
+
+config_files=($ZSH/*/*.zsh)
+for file in ${config_files:#*/completion.zsh}; do source $file; done
+
+autoload -Uz compinit && compinit
+
+for file in ${(M)config_files:#*/completion.zsh}; do source $file; done
+unset config_files file
+
+eval "$(mise activate zsh)"
+eval "$(starship init zsh)"
+
+### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
+export PATH="/Users/davidc/.rd/bin:$PATH"
+### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
