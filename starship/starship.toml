@@ -1,5 +1,5 @@
 add_newline = false
-format = "$username$directory$git_branch$git_status$cmd_duration$character"
+format = "$username$directory${custom.git_clean}${custom.git_dirty}${custom.git_unpushed}$cmd_duration$character"
 
 [username]
 show_always = true
@@ -12,13 +12,30 @@ truncation_length = 0
 truncate_to_repo = false
 format = "[$path]($style) "
 
-[git_branch]
+# Branch is green when clean, red with uncommitted/untracked changes.
+[custom.git_clean]
+require_repo = true
+shell = ["sh"]
+when = '[ -z "$(git status --porcelain 2>/dev/null)" ]'
+command = 'git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD'
 style = "bold green"
-format = "on [$branch]($style) "
+format = "on [$output]($style) "
 
-[git_status]
+[custom.git_dirty]
+require_repo = true
+shell = ["sh"]
+when = '[ -n "$(git status --porcelain 2>/dev/null)" ]'
+command = 'git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD'
 style = "bold red"
-format = "([$all_status$ahead_behind]($style) )"
+format = "on [$output]($style) "
+
+[custom.git_unpushed]
+require_repo = true
+shell = ["sh"]
+when = '[ -n "$(git cherry "@{upstream}" 2>/dev/null)" ]'
+command = 'echo unpushed'
+style = "bold purple"
+format = "with [$output]($style) "
 
 [cmd_duration]
 format = "took [$duration]($style) "
